@@ -1,3 +1,41 @@
+<?php
+    header('Content-Type: text/html; charset=utf-8');
+    require_once("conexao.php");
+    require_once("consultas_filmes.php");
+
+    // Processa exclusão se solicitado via GET
+    if (isset($_GET['excluir'])) {
+        deletarFilme($conexao, (int)$_GET['excluir']);
+        header("Location: filmes.php");
+        exit;
+    }
+
+    // Processa o salvamento da edição via POST
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['salvar_edicao'])) {
+        $id = (int)$_POST['id'];
+        $titulo = $_POST['titulo'];
+        $ano = (int)$_POST['ano'];
+        $diretor = $_POST['diretor'];
+        $pais = $_POST['pais'];
+        $diaria = (float)$_POST['diaria'];
+        $status = $_POST['status'];
+        $imagem_url = $_POST['imagem_url'];
+        $imdb = $_POST['imdb'];
+
+        editarFilme($conexao, $id, $titulo, $ano, $diretor, $pais, $diaria, $status, $imagem_url, $imdb);
+        header("Location: filmes.php");
+        exit;
+    }
+
+    // Se estiver editando, busca o filme correspondente pelo ID
+    $filmeEdicao = null;
+    if (isset($_GET['editar'])) {
+        $filmeEdicao = buscarFilme($conexao, (int)$_GET['editar']);
+    }
+
+    $filmes = exibirFilmes($conexao);
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -41,7 +79,7 @@
             <div class="menu_cabecalho">
                 <ul>
                     <li class="opcoes"><a href="index.html">Home</a></li>
-                    <li class="opcoes"><a href="filmes.html">Filmes</a></li>
+                    <li class="opcoes"><a href="filmes.php">Filmes</a></li>
                     <li class="opcoes"><a href="contato.html">Contato</a></li>
                 </ul>
                 <button type="button" id="botao_tema" class="botao_tema" onclick="alternarTema()">
@@ -128,52 +166,79 @@
                 <th>Link IMDB</th>
                 <th>Disponível para locação?</th>
                 <th>Preço Diária (R$)</th>
+                <th>Ações</th>
             </tr>
-            <tr class="linha">
-                <td><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIiuQpaG3_xbfAcSeopJAWVBRI4y4_rZQfeNNMgg2FYw&s=10"
-                        alt="Pôster de O Enigma de Outro Mundo" width="80"></td>
-                <td>O Enigma de Outro Mundo</td>
-                <td>Estados Unidos</td>
-                <td>1982</td>
-                <td>John Carpenter</td>
-                <td><a href="https://www.imdb.com/pt/title/tt0084787/?ref_=fn_t_1">Link</a></td>
-                <td>Sim</td>
-                <td>8,50</td>
-            </tr>
-            <tr class="linha">
-                <td><img src="https://m.media-amazon.com/images/M/MV5BZTcwMzY0MmEtYjMwNS00MGIwLTk5N2QtNTJjNjE5YWEyZjU3XkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
-                        alt="Pôster de Mangue Negro" width="80"></td>
-                <td>Mangue Negro</td>
-                <td>Brasil</td>
-                <td>2008</td>
-                <td>Rodrigo Aragão</td>
-                <td><a href="https://www.imdb.com/pt/title/tt1329396/?ref_=fn_t_2">Link</a></td>
-                <td>Sim</td>
-                <td>6,00</td>
-            </tr>
-            <tr class="linha">
-                <td><img src="https://upload.wikimedia.org/wikipedia/pt/4/4b/Rec_poster.jpg?utm_source=pt.wikipedia.org&utm_campaign=index&utm_content=original"
-                        alt="Pôster de [REC]" width="80"></td>
-                <td>[REC]</td>
-                <td>Espanha</td>
-                <td>2007</td>
-                <td>Jaume Balagueró</td>
-                <td><a href="https://www.imdb.com/pt/title/tt1038988/">Link</a></td>
-                <td>Sim</td>
-                <td>7,50</td>
-            </tr>
-            <tr class="linha">
-                <td><img src="https://m.media-amazon.com/images/M/MV5BNTMyZGVlNDMtMjU1Ni00NTgwLWE3Y2YtMDBkOGJjY2JiZGRiXkEyXkFqcGc@._V1_FMjpg_UX1000_.jpg"
-                        alt="Pôster de Les yeux sans visage" width="80"></td>
-                <td>Les yeux sans visage</td>
-                <td>França</td>
-                <td>1960</td>
-                <td>Georges Franju</td>
-                <td><a href="https://www.imdb.com/pt/title/tt0053459/">Link</a></td>
-                <td>Não</td>
-                <td>9,00</td>
-            </tr>
+            <?php
+            foreach ($filmes as $filme) {
+            ?>
+                <tr class="linha">
+                    <td><img src="<?= htmlspecialchars($filme['imagem_url']) ?>" width="80"></td>
+                    <td><?= htmlspecialchars($filme['titulo']) ?></td>
+                    <td><?= htmlspecialchars($filme['pais']) ?></td>
+                    <td><?= $filme['ano'] ?></td>
+                    <td><?= htmlspecialchars($filme['diretor']) ?></td>
+                    <td><a href="<?= htmlspecialchars($filme['imdb']) ?>" target="_blank">Link</a></td>
+                    <td><?= htmlspecialchars($filme['status']) ?></td>
+                    <td><?= number_format($filme['diaria'], 2, ',', '.') ?></td>
+                    <td class="coluna_acoes">
+                        <a href="filmes.php?editar=<?= $filme['id'] ?>#bloco_edicao" class="botao_acao botao_editar">Editar</a>
+                        <a href="filmes.php?excluir=<?= $filme['id'] ?>" class="botao_acao botao_excluir" onclick="return confirm('Tem certeza que deseja excluir o filme <?= htmlspecialchars(addslashes($filme['titulo'])) ?>?');">Excluir</a>
+                    </td>
+                </tr>
+            <?php 
+            } 
+            ?>
         </table><br>
+
+        <?php if (!empty($filmeEdicao)): ?>
+        <div id="bloco_edicao" class="bloco_edicao">
+            <h3 class="titulo_secundario" style="margin-bottom: 15px;">Editar Filme: <em><?= htmlspecialchars($filmeEdicao['titulo']) ?></em></h3>
+            <form method="POST" action="filmes.php" class="pure-form pure-form-aligned">
+                <input type="hidden" name="id" value="<?= $filmeEdicao['id'] ?>">
+
+                <div class="pure-control-group">
+                    <label for="titulo_edit">Título:</label>
+                    <input type="text" id="titulo_edit" name="titulo" value="<?= htmlspecialchars($filmeEdicao['titulo']) ?>" required>
+                </div>
+                <div class="pure-control-group">
+                    <label for="ano_edit">Ano:</label>
+                    <input type="number" id="ano_edit" name="ano" value="<?= $filmeEdicao['ano'] ?>" required>
+                </div>
+                <div class="pure-control-group">
+                    <label for="diretor_edit">Diretor:</label>
+                    <input type="text" id="diretor_edit" name="diretor" value="<?= htmlspecialchars($filmeEdicao['diretor']) ?>" required>
+                </div>
+                <div class="pure-control-group">
+                    <label for="pais_edit">País:</label>
+                    <input type="text" id="pais_edit" name="pais" value="<?= htmlspecialchars($filmeEdicao['pais']) ?>" required>
+                </div>
+                <div class="pure-control-group">
+                    <label for="diaria_edit">Preço Diária (R$):</label>
+                    <input type="number" step="0.01" id="diaria_edit" name="diaria" value="<?= $filmeEdicao['diaria'] ?>" required>
+                </div>
+                <div class="pure-control-group">
+                    <label for="status_edit">Status:</label>
+                    <select id="status_edit" name="status">
+                        <option value="Disponível" <?= $filmeEdicao['status'] === 'Disponível' ? 'selected' : '' ?>>Disponível</option>
+                        <option value="Indisponível" <?= $filmeEdicao['status'] === 'Indisponível' ? 'selected' : '' ?>>Indisponível</option>
+                    </select>
+                </div>
+                <div class="pure-control-group">
+                    <label for="imagem_url_edit">URL da Imagem:</label>
+                    <input type="text" id="imagem_url_edit" name="imagem_url" value="<?= htmlspecialchars($filmeEdicao['imagem_url']) ?>" required style="width: 60%;">
+                </div>
+                <div class="pure-control-group">
+                    <label for="imdb_edit">Link IMDb:</label>
+                    <input type="text" id="imdb_edit" name="imdb" value="<?= htmlspecialchars($filmeEdicao['imdb']) ?>" required style="width: 60%;">
+                </div>
+
+                <div class="pure-controls" style="margin-top: 15px;">
+                    <button type="submit" name="salvar_edicao" class="pure-button pure-button-primary">Salvar Alterações</button>
+                    <a href="filmes.php" class="pure-button">Cancelar</a>
+                </div>
+            </form>
+        </div>
+        <?php endif; ?>
     </section>
 
     <section class="container">
@@ -302,13 +367,17 @@
             return true;
         }
 
-        // Funcionalidade 3: filtrar filmes
+        function normalizarTexto(texto) {
+            return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
+
+        // Funcionalidade 3: filtrar filmes (ignora acentos e ç)
         function filtrarFilmes() {
-            const pesquisa = document.getElementById("pesquisaFilmes").value.toLowerCase();
+            const pesquisa = normalizarTexto(document.getElementById("pesquisaFilmes").value);
             const linhas = document.querySelectorAll(".linha");
 
             for (let i = 1; i < linhas.length; i++) {
-                const textoLinha = linhas[i].textContent.toLowerCase();
+                const textoLinha = normalizarTexto(linhas[i].textContent);
                 linhas[i].style.display = textoLinha.includes(pesquisa) ? "" : "none";
             }
         }

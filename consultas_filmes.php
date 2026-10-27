@@ -4,27 +4,13 @@
     function exibirFilmes($conexao) {
         $sql = "SELECT * FROM filmes";
         $resultado = mysqli_query($conexao, $sql);
-
-        if (mysqli_num_rows($resultado) > 0) {
-            while ($row = mysqli_fetch_assoc($resultado)) {
-                echo "ID: " . $row['id'] . " - Título: " . $row['titulo'] . " - Ano: " . $row['ano'] . " - Diretor: " . $row['diretor'] . " - País: " . $row['pais'] . " - Diária: R$ " . $row['diaria'] . " - Status: " . $row['status'] . " - Imagem: " . $row['imagem_url'] . " - IMDB: " . $row['imdb'] . "<br>";
-            }
-        } else {
-            echo "Nenhum filme encontrado";
-        }
+        return mysqli_fetch_all($resultado, MYSQLI_ASSOC);
     }
 
     function buscarFilme($conexao, $id) {
         $sql = "SELECT * FROM filmes WHERE id = $id";
         $resultado = mysqli_query($conexao, $sql);
-
-        if (mysqli_num_rows($resultado) > 0) {
-            while ($row = mysqli_fetch_assoc($resultado)) {
-                echo "ID: " . $row['id'] . " - Título: " . $row['titulo'] . " - Ano: " . $row['ano'] . " - Diretor: " . $row['diretor'] . " - País: " . $row['pais'] . " - Diária: R$ " . $row['diaria'] . " - Status: " . $row['status'] . " - Imagem: " . $row['imagem_url'] . " - IMDB: " . $row['imdb'] . "<br>";
-            }
-        } else {
-            echo "Nenhum filme encontrado";
-        }
+        return mysqli_fetch_assoc($resultado);
     }
 
     function inserirFilme($conexao, $titulo, $ano, $diretor, $pais, $diaria, $status, $imagem_url, $imdb) {
@@ -40,23 +26,11 @@
 
     function editarFilme($conexao, $id, $titulo, $ano, $diretor, $pais, $diaria, $status, $imagem_url, $imdb) {
         $sql = "UPDATE filmes SET titulo = '$titulo', ano = $ano, diretor = '$diretor', pais = '$pais', diaria = $diaria, status = '$status', imagem_url = '$imagem_url', imdb = '$imdb' WHERE id = $id";
-        $resultado = mysqli_query($conexao, $sql);
-
-        if ($resultado) {
-            echo "Filme editado com sucesso";
-        } else {
-            echo "Erro ao editar filme";
-        }
+        return mysqli_query($conexao, $sql);
     }
 
     function deletarFilme($conexao, $id) {
         $sql = "DELETE FROM filmes WHERE id = $id";
-        $resultado = mysqli_query($conexao, $sql);
-
-        if ($resultado) {
-            echo "Filme deletado com sucesso";
-        } else {
-            echo "Erro ao deletar filme";
-        }
+        return mysqli_query($conexao, $sql);
     }
 ?>
