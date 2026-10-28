@@ -159,6 +159,25 @@ iframe {
     transform: scale(1.04);
 }
 
+.botao_incluir {
+    background-color: #1e6b37;
+    color: #ffffff !important;
+    text-decoration: none;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.botao_incluir:hover {
+    background-color: #278846;
+    transform: scale(1.04);
+}
+
 .card_sorteio {
     background-color: #fff4f4;
     border-left: 5px solid #631212;
@@ -462,6 +481,14 @@ body.modo_noturno .botao_excluir {
 }
 body.modo_noturno .botao_excluir:hover {
     background-color: #e50914;
+}
+
+body.modo_noturno .botao_incluir {
+    background-color: #195e30;
+}
+
+body.modo_noturno .botao_incluir:hover {
+    background-color: #238042;
 }
 
 /* Bloco de Edição de Filmes */

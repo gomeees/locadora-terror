@@ -14,14 +14,17 @@
     }
 
     function inserirFilme($conexao, $titulo, $ano, $diretor, $pais, $diaria, $status, $imagem_url, $imdb) {
+        $titulo = mysqli_real_escape_string($conexao, $titulo);
+        $diretor = mysqli_real_escape_string($conexao, $diretor);
+        $pais = mysqli_real_escape_string($conexao, $pais);
+        $status = mysqli_real_escape_string($conexao, $status);
+        $imagem_url = mysqli_real_escape_string($conexao, $imagem_url);
+        $imdb = mysqli_real_escape_string($conexao, $imdb);
+        $ano = (int)$ano;
+        $diaria = (float)$diaria;
+
         $sql = "INSERT INTO filmes (titulo, ano, diretor, pais, diaria, status, imagem_url, imdb) VALUES ('$titulo', $ano, '$diretor', '$pais', $diaria, '$status', '$imagem_url', '$imdb')";
-        $resultado = mysqli_query($conexao, $sql);
-        
-        if ($resultado) {
-            echo "Filme inserido com sucesso";
-        } else {
-            echo "Erro ao inserir filme";
-        }
+        return mysqli_query($conexao, $sql);
     }
 
     function editarFilme($conexao, $id, $titulo, $ano, $diretor, $pais, $diaria, $status, $imagem_url, $imdb) {

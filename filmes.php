@@ -3,14 +3,12 @@
     require_once("conexao.php");
     require_once("consultas_filmes.php");
 
-    // Processa exclusão se solicitado via GET
     if (isset($_GET['excluir'])) {
         deletarFilme($conexao, (int)$_GET['excluir']);
         header("Location: filmes.php");
         exit;
     }
 
-    // Processa o salvamento da edição via POST
     if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['salvar_edicao'])) {
         $id = (int)$_POST['id'];
         $titulo = $_POST['titulo'];
@@ -27,11 +25,27 @@
         exit;
     }
 
-    // Se estiver editando, busca o filme correspondente pelo ID
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['salvar_inclusao'])) {
+        $titulo = $_POST['titulo'];
+        $ano = (int)$_POST['ano'];
+        $diretor = $_POST['diretor'];
+        $pais = $_POST['pais'];
+        $diaria = (float)$_POST['diaria'];
+        $status = $_POST['status'];
+        $imagem_url = $_POST['imagem_url'];
+        $imdb = $_POST['imdb'];
+
+        inserirFilme($conexao, $titulo, $ano, $diretor, $pais, $diaria, $status, $imagem_url, $imdb);
+        header("Location: filmes.php");
+        exit;
+    }
+
     $filmeEdicao = null;
     if (isset($_GET['editar'])) {
         $filmeEdicao = buscarFilme($conexao, (int)$_GET['editar']);
     }
+
+    $exibirInclusao = isset($_GET['novo']);
 
     $filmes = exibirFilmes($conexao);
 ?>
@@ -140,6 +154,7 @@
             <input type="text" id="pesquisaFilmes" onkeyup="filtrarFilmes()" placeholder="Pesquisar filmes...">
             <button type="button" id="botao_surpreenda" class="botao_surpreenda"
                 onclick="sortearFilme()">Surpreenda-me!</button>
+            <a href="filmes.php?novo=1#bloco_cadastro" class="botao_incluir">+ Incluir Filme</a>
         </div>
 
         <div id="cardSorteio" class="card_sorteio" style="display: none;">
@@ -234,6 +249,54 @@
 
                 <div class="pure-controls" style="margin-top: 15px;">
                     <button type="submit" name="salvar_edicao" class="pure-button pure-button-primary">Salvar Alterações</button>
+                    <a href="filmes.php" class="pure-button">Cancelar</a>
+                </div>
+            </form>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($exibirInclusao): ?>
+        <div id="bloco_cadastro" class="bloco_edicao">
+            <h3 class="titulo_secundario" style="margin-bottom: 15px;">Cadastrar Novo Filme</h3>
+            <form method="POST" action="filmes.php" class="pure-form pure-form-aligned">
+                <div class="pure-control-group">
+                    <label for="titulo_novo">Título:</label>
+                    <input type="text" id="titulo_novo" name="titulo">
+                </div>
+                <div class="pure-control-group">
+                    <label for="ano_novo">Ano:</label>
+                    <input type="number" id="ano_novo" name="ano">
+                </div>
+                <div class="pure-control-group">
+                    <label for="diretor_novo">Diretor:</label>
+                    <input type="text" id="diretor_novo" name="diretor">
+                </div>
+                <div class="pure-control-group">
+                    <label for="pais_novo">País:</label>
+                    <input type="text" id="pais_novo" name="pais">
+                </div>
+                <div class="pure-control-group">
+                    <label for="diaria_novo">Preço Diária (R$):</label>
+                    <input type="number" step="0.01" id="diaria_novo" name="diaria">
+                </div>
+                <div class="pure-control-group">
+                    <label for="status_novo">Status:</label>
+                    <select id="status_novo" name="status">
+                        <option value="Disponível">Disponível</option>
+                        <option value="Indisponível">Indisponível</option>
+                    </select>
+                </div>
+                <div class="pure-control-group">
+                    <label for="imagem_url_novo">URL da Imagem:</label>
+                    <input type="text" id="imagem_url_novo" name="imagem_url" required placeholder="https://..." style="width: 60%;">
+                </div>
+                <div class="pure-control-group">
+                    <label for="imdb_novo">Link IMDb:</label>
+                    <input type="text" id="imdb_novo" name="imdb" required placeholder="https://www.imdb.com/title/..." style="width: 60%;">
+                </div>
+
+                <div class="pure-controls" style="margin-top: 15px;">
+                    <button type="submit" name="salvar_inclusao" class="pure-button pure-button-primary">Cadastrar Filme</button>
                     <a href="filmes.php" class="pure-button">Cancelar</a>
                 </div>
             </form>
@@ -382,7 +445,7 @@
             }
         }
 
-        // Funcionalidade 4: Sorteador de Filmes ("Surpreenda-me")
+        // Funcionalidade 4: sorteador de filmes ("Surpreenda-me")
         function sortearFilme() {
             const linhas = document.querySelectorAll(".tabela .linha");
             const linhasFilmes = Array.from(linhas).slice(1);
@@ -405,7 +468,7 @@
             document.getElementById("cardSorteio").style.display = "none";
         }
 
-        // Funcionalidade 5: Simulador de Orçamento de Locação
+        // Funcionalidade 5: simulador de Orçamento de Locação
         function calcularOrcamento() {
             const selectFilme = document.getElementById("filme_locacao");
             const inputDias = document.getElementById("qtd_dias");
@@ -454,7 +517,7 @@
         // Funcionalidade 6: ano dinâmico
         document.getElementById("ano").textContent = new Date().getFullYear();
 
-        // Funcionalidade 7: Alternar Modo Noturno
+        // Funcionalidade 7: modo Noturno
         function alternarTema() {
             const botao = document.getElementById("botao_tema");
             const estaNoturno = document.body.classList.toggle("modo_noturno");
