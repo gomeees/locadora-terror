@@ -213,23 +213,23 @@
 
                 <div class="pure-control-group">
                     <label for="titulo_edit">Título:</label>
-                    <input type="text" id="titulo_edit" name="titulo" value="<?= htmlspecialchars($filmeEdicao['titulo']) ?>" required>
+                    <input type="text" id="titulo_edit" name="titulo" value="<?= htmlspecialchars($filmeEdicao['titulo']) ?>">
                 </div>
                 <div class="pure-control-group">
                     <label for="ano_edit">Ano:</label>
-                    <input type="number" id="ano_edit" name="ano" value="<?= $filmeEdicao['ano'] ?>" required>
+                    <input type="number" id="ano_edit" name="ano" value="<?= $filmeEdicao['ano'] ?>">
                 </div>
                 <div class="pure-control-group">
                     <label for="diretor_edit">Diretor:</label>
-                    <input type="text" id="diretor_edit" name="diretor" value="<?= htmlspecialchars($filmeEdicao['diretor']) ?>" required>
+                    <input type="text" id="diretor_edit" name="diretor" value="<?= htmlspecialchars($filmeEdicao['diretor']) ?>">
                 </div>
                 <div class="pure-control-group">
                     <label for="pais_edit">País:</label>
-                    <input type="text" id="pais_edit" name="pais" value="<?= htmlspecialchars($filmeEdicao['pais']) ?>" required>
+                    <input type="text" id="pais_edit" name="pais" value="<?= htmlspecialchars($filmeEdicao['pais']) ?>">
                 </div>
                 <div class="pure-control-group">
                     <label for="diaria_edit">Preço Diária (R$):</label>
-                    <input type="number" step="0.01" id="diaria_edit" name="diaria" value="<?= $filmeEdicao['diaria'] ?>" required>
+                    <input type="number" step="0.01" id="diaria_edit" name="diaria" value="<?= $filmeEdicao['diaria'] ?>">
                 </div>
                 <div class="pure-control-group">
                     <label for="status_edit">Status:</label>
@@ -240,11 +240,11 @@
                 </div>
                 <div class="pure-control-group">
                     <label for="imagem_url_edit">URL da Imagem:</label>
-                    <input type="text" id="imagem_url_edit" name="imagem_url" value="<?= htmlspecialchars($filmeEdicao['imagem_url']) ?>" required style="width: 60%;">
+                    <input type="text" id="imagem_url_edit" name="imagem_url" value="<?= htmlspecialchars($filmeEdicao['imagem_url']) ?>" style="width: 60%;">
                 </div>
                 <div class="pure-control-group">
                     <label for="imdb_edit">Link IMDb:</label>
-                    <input type="text" id="imdb_edit" name="imdb" value="<?= htmlspecialchars($filmeEdicao['imdb']) ?>" required style="width: 60%;">
+                    <input type="text" id="imdb_edit" name="imdb" value="<?= htmlspecialchars($filmeEdicao['imdb']) ?>" style="width: 60%;">
                 </div>
 
                 <div class="pure-controls" style="margin-top: 15px;">
@@ -408,61 +408,79 @@
             return true;
         }
 
-        function validaFilme() {
-            const titulo = document.getElementById("titulo_novo").value.trim();
-            const ano = document.getElementById("ano_novo").value.trim();
-            const diretor = document.getElementById("diretor_novo").value.trim();
-            const pais = document.getElementById("pais_novo").value.trim();
-            const diaria = document.getElementById("diaria_novo").value.trim();
-            const status = document.getElementById("status_novo").value.trim();
-            const imagemUrl = document.getElementById("imagem_url_novo").value.trim();
-            const imdb = document.getElementById("imdb_novo").value.trim();
+        function validaFilme(tipo) {
+            const titulo = document.getElementById("titulo_" + tipo).value.trim();
+            const ano = document.getElementById("ano_" + tipo).value.trim();
+            const diretor = document.getElementById("diretor_" + tipo).value.trim();
+            const pais = document.getElementById("pais_" + tipo).value.trim();
+            const diaria = document.getElementById("diaria_" + tipo).value.trim();
+            const status = document.getElementById("status_" + tipo).value.trim();
+            const imagemUrl = document.getElementById("imagem_url_" + tipo).value.trim();
+            const imdb = document.getElementById("imdb_" + tipo).value.trim();
 
             if (!titulo) {
                 alert("Erro: O campo 'Título' é obrigatório e não foi preenchido");
-                document.getElementById("titulo_novo").focus();
+                document.getElementById("titulo_" + tipo).focus();
                 return false;
             }
 
             if (!ano) {
                 alert("Erro: O campo 'Ano' é obrigatório e não foi preenchido");
-                document.getElementById("ano_novo").focus();
+                document.getElementById("ano_" + tipo).focus();
                 return false;
             }
 
             if (!diretor) {
                 alert("Erro: O campo 'Diretor' é obrigatório e não foi preenchido");
-                document.getElementById("diretor_novo").focus();
+                document.getElementById("diretor_" + tipo).focus();
                 return false;
             }
 
             if (!pais) {
                 alert("Erro: O campo 'País' é obrigatório e não foi preenchido");
-                document.getElementById("pais_novo").focus();
+                document.getElementById("pais_" + tipo).focus();
                 return false;
             }
 
             if (!diaria) {
                 alert("Erro: O campo 'Preço Diária (R$)' é obrigatório e não foi preenchido");
-                document.getElementById("diaria_novo").focus();
+                document.getElementById("diaria_" + tipo).focus();
                 return false;
             }
 
             if (!status) {
                 alert("Erro: O campo 'Status' é obrigatório e não foi preenchido");
-                document.getElementById("status_novo").focus();
+                document.getElementById("status_" + tipo).focus();
                 return false;
             }
 
             if (!imagemUrl) {
                 alert("Erro: O campo 'URL da Imagem' é obrigatório e não foi preenchido");
-                document.getElementById("imagem_url_novo").focus();
+                document.getElementById("imagem_url_" + tipo).focus();
                 return false;
             }
 
             if (!imdb) {
                 alert("Erro: O campo 'Link IMDb' é obrigatório e não foi preenchido");
-                document.getElementById("imdb_novo").focus();
+                document.getElementById("imdb_" + tipo).focus();
+                return false;
+            }
+
+            if (diaria < 0) {
+                alert("Erro: O campo 'Preço Diária (R$)' não pode ser negativo")                
+                document.getElementById("diaria_" + tipo).focus();
+                return false;
+            }
+
+            if(!imagemUrl.startsWith('https://') && !imagemUrl.startsWith('http://')){
+                alert("Erro: A URL da imagem deve começar com 'https://' ou 'http://'")
+                document.getElementById("imagem_url_" + tipo).focus();
+                return false;
+            }
+
+            if(!imdb.startsWith('https://') && !imdb.startsWith('http://')){
+                alert("Erro: A URL do IMDb deve começar com 'https://' ou 'http://'")
+                document.getElementById("imdb_" + tipo).focus();
                 return false;
             }
 
@@ -579,7 +597,7 @@
 
         if (formIncFilme) {
             formIncFilme.addEventListener("submit", function (event) {
-                if (!validaFilme()) {
+                if (!validaFilme("novo")) {
                     event.preventDefault();
                 }
             });
@@ -587,7 +605,7 @@
 
         if(formEditFilme) {
             formEditFilme.addEventListener("submit", function (event) {
-                if(!validaFilme()) {
+                if(!validaFilme("edit")) {
                     event.preventDefault();
                 }
             });
