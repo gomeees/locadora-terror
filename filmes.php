@@ -45,7 +45,7 @@
         $filmeEdicao = buscarFilme($conexao, (int)$_GET['editar']);
     }
 
-    $exibirInclusao = isset($_GET['novo']);
+    $filmeInclusao = isset($_GET['novo']);
 
     $filmes = exibirFilmes($conexao);
 ?>
@@ -154,7 +154,7 @@
             <input type="text" id="pesquisaFilmes" onkeyup="filtrarFilmes()" placeholder="Pesquisar filmes...">
             <button type="button" id="botao_surpreenda" class="botao_surpreenda"
                 onclick="sortearFilme()">Surpreenda-me!</button>
-            <a href="filmes.php?novo=1#bloco_cadastro" class="botao_incluir">+ Incluir Filme</a>
+            <a href="filmes.php?novo=1#bloco_cadastro" class="botao_incluir">Incluir Filme</a>
         </div>
 
         <div id="cardSorteio" class="card_sorteio" style="display: none;">
@@ -208,7 +208,7 @@
         <?php if (!empty($filmeEdicao)): ?>
         <div id="bloco_edicao" class="bloco_edicao">
             <h3 class="titulo_secundario" style="margin-bottom: 15px;">Editar Filme: <em><?= htmlspecialchars($filmeEdicao['titulo']) ?></em></h3>
-            <form method="POST" action="filmes.php" class="pure-form pure-form-aligned">
+            <form method="POST" action="filmes.php" class="pure-form pure-form-aligned" id="FormularioEditFilme">
                 <input type="hidden" name="id" value="<?= $filmeEdicao['id'] ?>">
 
                 <div class="pure-control-group">
@@ -255,10 +255,10 @@
         </div>
         <?php endif; ?>
 
-        <?php if ($exibirInclusao): ?>
+        <?php if ($filmeInclusao): ?>
         <div id="bloco_cadastro" class="bloco_edicao">
             <h3 class="titulo_secundario" style="margin-bottom: 15px;">Cadastrar Novo Filme</h3>
-            <form method="POST" action="filmes.php" class="pure-form pure-form-aligned">
+            <form method="POST" action="filmes.php" class="pure-form pure-form-aligned" id="FormularioIncFilme">
                 <div class="pure-control-group">
                     <label for="titulo_novo">Título:</label>
                     <input type="text" id="titulo_novo" name="titulo">
@@ -288,11 +288,11 @@
                 </div>
                 <div class="pure-control-group">
                     <label for="imagem_url_novo">URL da Imagem:</label>
-                    <input type="text" id="imagem_url_novo" name="imagem_url" required placeholder="https://..." style="width: 60%;">
+                    <input type="text" id="imagem_url_novo" name="imagem_url" placeholder="https://..." style="width: 60%;">
                 </div>
                 <div class="pure-control-group">
                     <label for="imdb_novo">Link IMDb:</label>
-                    <input type="text" id="imdb_novo" name="imdb" required placeholder="https://www.imdb.com/title/..." style="width: 60%;">
+                    <input type="text" id="imdb_novo" name="imdb" placeholder="https://www.imdb.com/title/..." style="width: 60%;">
                 </div>
 
                 <div class="pure-controls" style="margin-top: 15px;">
@@ -371,6 +371,8 @@
 
     <script>
         const form = document.getElementById("Formulario");
+        const formIncFilme = document.getElementById("FormularioIncFilme");
+        const formEditFilme = document.getElementById("FormularioEditFilme");
 
         // Funcionalidade 1: validação de cadastro
         function validaCadastro() {
@@ -400,6 +402,67 @@
             if (!email) {
                 alert("Erro: O campo 'Email' é obrigatório e não foi preenchido");
                 document.getElementById("email").focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        function validaFilme() {
+            const titulo = document.getElementById("titulo_novo").value.trim();
+            const ano = document.getElementById("ano_novo").value.trim();
+            const diretor = document.getElementById("diretor_novo").value.trim();
+            const pais = document.getElementById("pais_novo").value.trim();
+            const diaria = document.getElementById("diaria_novo").value.trim();
+            const status = document.getElementById("status_novo").value.trim();
+            const imagemUrl = document.getElementById("imagem_url_novo").value.trim();
+            const imdb = document.getElementById("imdb_novo").value.trim();
+
+            if (!titulo) {
+                alert("Erro: O campo 'Título' é obrigatório e não foi preenchido");
+                document.getElementById("titulo_novo").focus();
+                return false;
+            }
+
+            if (!ano) {
+                alert("Erro: O campo 'Ano' é obrigatório e não foi preenchido");
+                document.getElementById("ano_novo").focus();
+                return false;
+            }
+
+            if (!diretor) {
+                alert("Erro: O campo 'Diretor' é obrigatório e não foi preenchido");
+                document.getElementById("diretor_novo").focus();
+                return false;
+            }
+
+            if (!pais) {
+                alert("Erro: O campo 'País' é obrigatório e não foi preenchido");
+                document.getElementById("pais_novo").focus();
+                return false;
+            }
+
+            if (!diaria) {
+                alert("Erro: O campo 'Preço Diária (R$)' é obrigatório e não foi preenchido");
+                document.getElementById("diaria_novo").focus();
+                return false;
+            }
+
+            if (!status) {
+                alert("Erro: O campo 'Status' é obrigatório e não foi preenchido");
+                document.getElementById("status_novo").focus();
+                return false;
+            }
+
+            if (!imagemUrl) {
+                alert("Erro: O campo 'URL da Imagem' é obrigatório e não foi preenchido");
+                document.getElementById("imagem_url_novo").focus();
+                return false;
+            }
+
+            if (!imdb) {
+                alert("Erro: O campo 'Link IMDb' é obrigatório e não foi preenchido");
+                document.getElementById("imdb_novo").focus();
                 return false;
             }
 
@@ -513,6 +576,22 @@
                 alert("Sucesso: Todos os campos obrigatórios foram informados");
             }
         });
+
+        if (formIncFilme) {
+            formIncFilme.addEventListener("submit", function (event) {
+                if (!validaFilme()) {
+                    event.preventDefault();
+                }
+            });
+        }
+
+        if(formEditFilme) {
+            formEditFilme.addEventListener("submit", function (event) {
+                if(!validaFilme()) {
+                    event.preventDefault();
+                }
+            });
+        }
 
         // Funcionalidade 6: ano dinâmico
         document.getElementById("ano").textContent = new Date().getFullYear();
